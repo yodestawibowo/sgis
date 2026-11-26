@@ -1,0 +1,49 @@
+name: tanggamus-webgis-3d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: tanggamus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${PGUSER:-tanggamus_admin}
+      POSTGRES_PASSWORD: ${PGPASSWORD:-tanggamus_secure_2026}
+      POSTGRES_DB: ${PGDATABASE:-tanggamus_webgis}
+    volumes:
+      - tanggamus_pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PGUSER:-tanggamus_admin} -d ${PGDATABASE:-tanggamus_webgis}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  webgis:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tanggamus-webgis-app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: ${PGUSER:-tanggamus_admin}
+      PGPASSWORD: ${PGPASSWORD:-tanggamus_secure_2026}
+      PGDATABASE: ${PGDATABASE:-tanggamus_webgis}
+      VITE_GOOGLE_MAPS_API_KEY: ${VITE_GOOGLE_MAPS_API_KEY:-}
+      ADMIN_PASSCODE: ${ADMIN_PASSCODE:-}
+    ports:
+      - "3000:3000"
+    volumes:
+      - tanggamus_appdata:/app/data
+
+volumes:
+  tanggamus_pgdata:
+  tanggamus_appdata:

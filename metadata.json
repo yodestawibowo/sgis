@@ -1,0 +1,6 @@
+{
+  "name": "WebGIS 3D Kabupaten Tanggamus",
+  "description": "Aplikasi peta 3D interaktif Kabupaten Tanggamus dengan navigasi real-time, pencarian lokasi mendetail, statistik demografi, kesehatan & pendidikan, dashboard admin, ekspor laporan, serta siap migrasi PostgreSQL Docker CasaOS.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
